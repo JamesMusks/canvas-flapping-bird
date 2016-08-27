@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <style>
+        *{
+            padding: 0;
+            margin: 0;
+        }
+        body{
+            position: relative;
+            background-color: #ccc;
+        }
+        .score{
+            position: absolute;
+            top: 2%;
+            right: 25%;
+            font: 20px bolder;
+            color:green
+        }
+        .gameover{
+            position: absolute;
+            font: 80px  bolder;
+            font-family:  "微软雅黑" ;
+            top: 40%;
+            right:30%;
+            display: none;
+            color:green;
+        }
+        canvas{
+            display: block;
+            margin: 0 auto;
+            margin-top: 30px;
+            border:2px solid green;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="canvasId" width="800" height="600"></canvas>
+    <span class="score"></span>
+    <span class="gameover">Game Over</span>
+    <script src="js/jquery-1.12.3.js"></script>
+    <script src="js/tool.js"></script>
+    <script src="js/getImages.js"></script>
+    <script src="js/sky.js"></script>
+    <script src="js/land.js"></script>
+    <script src="js/pipe.js"></script>
+    <script src="js/bird.js"></script>
+    <script>
+        // 游戏入口函数
+        (function main() {
+            var canvas=document.querySelector("#canvasId");
+            var ctx=canvas.getContext("2d");
+            var num=0;
+
+            getImgs(function (imgObj) {
+
+                //初始化天空
+                Sky.init(canvas,ctx,imgObj.sky);
+                Land.init(canvas,ctx,imgObj.land);
+                Pipe.init(ctx, canvas, imgObj.pipeDown, imgObj.pipeUp);
+                Bird.init(canvas,ctx,imgObj.bird);
+
+                //实例化天空
+                var sky=new Sky(0,0);
+                var sky1=new Sky(imgObj.sky.width,0);
+
+                //实例化大地
+                var land=new Land(0,canvas.height-imgObj.land.height);
+                var land1=new Land(imgObj.land.width,canvas.height-imgObj.land.height);
+                var land2=new Land(imgObj.land.width*2,canvas.height-imgObj.land.height);
+                var land3=new Land(imgObj.land.width*3,canvas.height-imgObj.land.height);
+
+                //实例化水管
+
+                var pipe = new Pipe(400 + imgObj.pipeDown.width * 3 * 0);
+                var pipe2 = new Pipe(400 + imgObj.pipeDown.width * 3 * 1);
+                var pipe3 = new Pipe(400 + imgObj.pipeDown.width * 3 * 2);
+                var pipe4 = new Pipe(400 + imgObj.pipeDown.width * 3 * 3);
+                var pipe5 = new Pipe(400 + imgObj.pipeDown.width * 3 * 4);
+                var pipe6 = new Pipe(400 + imgObj.pipeDown.width * 3 * 5);
+
+
+
+
+                //实例化鸟类
+                var bird=new Bird(150,200,50,50);
+
+
+                var timer=setInterval(function () {
+                    num++;
+                    document.querySelector(".score").innerHTML="score "+num;
+                    //获取小鸟中心点的坐标，判断是否出界
+                    var birdCoreX=bird.x+1/2*bird.h;
+                    var birdCoreY=bird.y+1/2*bird.w
+
+                    //判断是否撞到大地
+                    if(birdCoreY<=0||birdCoreY>=canvas.height-imgObj.land.height){
+                        clearInterval(timer);
+                        $(".gameover").fadeIn(600);
+                }
+
+                    //判断是否撞到水管
+                    if(ctx.isPointInPath(birdCoreX, birdCoreY)){
+                        clearInterval(timer);
+                        $(".gameover").fadeIn(600);
+
+                    };
+                    ctx.clearRect(0,0,canvas.width,canvas.height);
+                    //绘制天空
+                    sky.draw();
+                    sky.update();
+                    sky1.draw();
+                    sky1.update();
+
+
+                    // 绘制上边的管子
+                    //清除页面上的路径
+                    ctx.beginPath();
+                    pipe.draw();
+                    pipe.update();
+                    pipe2.draw();
+                    pipe2.update();
+                    pipe3.draw();
+                    pipe3.update();
+                    pipe4.draw();
+                    pipe4.update();
+                    pipe5.draw();
+                    pipe5.update();
+                    pipe6.draw();
+                    pipe6.update();
+
+
+                    //绘制大地
+                    land.draw();
+                    land.update();
+                    land1.draw();
+                    land1.update();
+                    land2.draw();
+                    land2.update();
+                    land3.draw();
+                    land3.update();
+
+
+
+                    bird.draw();
+                    bird.update();
+                    bird.bind();
+                },50);
+
+            });
+        }());
+
+    </script>
+</body>
+</html>
